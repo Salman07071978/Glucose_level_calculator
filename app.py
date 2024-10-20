@@ -1,4 +1,22 @@
 import streamlit as st
+import random
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Fun facts and tips
+fun_facts = [
+    "Did you know? Walking for 30 minutes a day can help lower blood sugar!",
+    "Tip: Eating whole grains instead of refined carbs helps maintain steady glucose levels.",
+    "Fun fact: Drinking water before meals can help you stay hydrated and control your appetite!",
+    "Motivation: Small daily improvements are the key to long-term success!"
+]
+
+motivational_quotes = [
+    "You are stronger than you think!",
+    "Keep pushing forward, one step at a time.",
+    "Believe in yourself and stay consistent.",
+    "You got this! Health is a journey, not a sprint."
+]
 
 # Define a function to estimate HbA1c based on average blood glucose
 def estimate_hba1c(avg_glucose):
@@ -26,13 +44,28 @@ def health_advice(glucose_level, time_of_day):
         return "⚠️ Invalid time of day."
 
 # Streamlit App UI
-st.title("🩸 Blood Glucose & HbA1c Health Advisor")
+st.title("🩸 Blood Glucose & HbA1c Health Advisor with Fun Features")
 
 st.markdown("""
 Welcome to the **Blood Glucose & HbA1c Estimator**!  
-This app helps you assess your blood glucose levels, provides health advice based on your input, and estimates your HbA1c—a key indicator of long-term blood sugar control.  
-Let's get started!  
+This app helps you assess your blood glucose levels, provides health advice based on your input, estimates your HbA1c, and offers lifestyle tips and motivational quotes.  
+Let's get started!
 """)
+
+# Theme selection
+theme = st.sidebar.selectbox("Choose a theme:", ['Light Mode', 'Dark Mode'])
+
+# Apply the theme (just for fun)
+if theme == 'Dark Mode':
+    st.write('<style>body {background-color: #2e2e2e; color: white;}</style>', unsafe_allow_html=True)
+
+# Fun Fact
+st.sidebar.subheader("🎉 Fun Fact")
+st.sidebar.write(random.choice(fun_facts))
+
+# Motivational Message
+st.sidebar.subheader("💪 Motivation for You")
+st.sidebar.write(random.choice(motivational_quotes))
 
 # Create columns for better layout
 col1, col2 = st.columns(2)
@@ -77,6 +110,35 @@ if avg_glucose:
         st.warning("Your HbA1c indicates **prediabetes**. It's time to take action with healthier habits!")
     else:
         st.error("Your HbA1c indicates **diabetes**. Please consult a healthcare provider for further advice.")
+
+# Glucose Tracking Feature
+st.header("📈 Track Your Glucose Levels")
+
+st.markdown("""
+Enter up to 7 readings below to track your glucose levels over time:
+""")
+
+# Input for multiple glucose readings
+readings = []
+for i in range(7):
+    reading = st.number_input(f"Reading {i+1} (mg/dL)", min_value=0, step=1, key=f"reading{i}")
+    readings.append(reading)
+
+# Filter out empty readings
+readings = [r for r in readings if r > 0]
+
+# Plot glucose trend if there are readings
+if readings:
+    st.subheader("Glucose Trend")
+    days = np.arange(1, len(readings) + 1)
+    
+    plt.figure(figsize=(6, 4))
+    plt.plot(days, readings, marker='o', linestyle='-', color='blue')
+    plt.title('Glucose Levels Over Time')
+    plt.xlabel('Days')
+    plt.ylabel('Glucose Level (mg/dL)')
+    plt.xticks(days)
+    st.pyplot(plt)
 
 # Conclusion with footer
 st.markdown("---")
